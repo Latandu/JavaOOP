@@ -6,7 +6,7 @@ public class SowThistle extends Plant{
     public SowThistle(){
         this.setStrength(0);
         this.setSymbol(sowThistleSymbol);
-        this.setAnimalName("Sow Thistle");
+        this.setAnimalName("SowThistle");
         this.setInitiative(0);
     }
 
@@ -20,5 +20,10 @@ public class SowThistle extends Plant{
         } else {
            super.Action();
         }
+    }
+
+    @Override
+    protected int Collision(Point point) {
+        return 0;
     }
 }

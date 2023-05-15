@@ -12,7 +12,7 @@ public class Antelope extends Animal {
     @Override
     protected void Action() {
         boolean[] isNotFilled = {false, false, false, false};
-        if (super.CheckForFilling(isNotFilled, 2, '"', point) != 0) {
+        if (super.organismHandler.CheckForFilling(isNotFilled, 2, '"', point, world) != 0) {
             return;
         }
         int positionReturnCode = 0;
@@ -54,7 +54,7 @@ public class Antelope extends Animal {
         int randomFightReturn = rand.nextInt(0,2);
         if(randomFightReturn == 1){
             boolean[] isNotFilled = {false, false,false ,false};
-            if(super.CheckForFilling(isNotFilled, 2, '"', point) != 0) {
+            if(super.organismHandler.CheckForFilling(isNotFilled, 2, '"', point, world) != 0) {
                 return true;
             }
             Organism newOrganismPosition = world.GetOrganism(point.getX(), point.getY());

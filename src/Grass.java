@@ -6,4 +6,9 @@ public class Grass extends Plant {
         this.setSymbol(grassSymbol);
         this.setAnimalName("Grass");
     }
+
+    @Override
+    protected int Collision(Point point) {
+        return 0;
+    }
 }

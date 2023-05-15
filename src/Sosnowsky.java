@@ -20,35 +20,29 @@ public class Sosnowsky extends Plant {
         }
     }
     protected void Action() {
-        Organism organism1 = world.GetOrganism(point.getX()-1, point.getY());
-        Organism organism2 = world.GetOrganism(point.getX()+1, point.getY());
-        Organism organism3 = world.GetOrganism(point.getX(), point.getY()+1);
-        Organism organism4 = world.GetOrganism(point.getX(), point.getY()-1);
+        int[][] neighborCoordinates = {
+                {point.getX() - 1, point.getY()},
+                {point.getX() + 1, point.getY()},
+                {point.getX(), point.getY() + 1},
+                {point.getX(), point.getY() - 1}
+        };
 
-        if(organism1 != null && organism1.getInitiative() != 0){
-           if(organism1.getSymbol() == '@')
-               world.setAliveHuman(false);
-            world.DeleteOrganism(organism1,point.getX()-1, point.getY());
+        for (int[] neighborCoordinate : neighborCoordinates) {
+            int neighborX = neighborCoordinate[0];
+            int neighborY = neighborCoordinate[1];
+            Organism organism = world.GetOrganism(neighborX, neighborY);
 
+            if (organism != null && organism.getInitiative() != 0) {
+                if (organism.getSymbol() == '@') {
+                    world.setAliveHuman(false);
+                }
+                world.DeleteOrganism(organism, neighborX, neighborY);
+            }
         }
-        if(organism2 != null &&  organism2.getInitiative() != 0){
-            if(organism2.getSymbol() == '@')
-                world.setAliveHuman(false);
-            world.DeleteOrganism(organism2,point.getX()+1, point.getY());
-        }
+    }
 
-
-        if(organism3 != null &&  organism3.getInitiative() != 0){
-            if(organism3.getSymbol() == '@')
-                world.setAliveHuman(false);
-            world.DeleteOrganism(organism3,point.getX(), point.getY()+1);
-
-        }
-
-        if(organism4 != null && organism4.getInitiative() != 0){
-            if(organism4.getSymbol() == '@')
-                world.setAliveHuman(false);
-            world.DeleteOrganism(organism4,point.getX(), point.getY()-1);
-        }
+    @Override
+    protected int Collision(Point point) {
+        return 0;
     }
 }

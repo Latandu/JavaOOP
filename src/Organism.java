@@ -1,4 +1,4 @@
-public class Organism {
+public abstract class Organism {
     private int strength = 0, initiative = 0, age = 0, coolDown = 0;
     private boolean roundDone = false;
     private char symbol = '*';
@@ -7,12 +7,8 @@ public class Organism {
     public int getStrength() {
         return strength;
     }
-    protected  void Action(){
-
-    }
-    protected int Collision(Point point){
-        return 0;
-    }
+    protected  abstract void Action();
+    protected abstract int Collision(Point point);
     protected boolean SpecialAttack(Organism organism){
         return false;
 

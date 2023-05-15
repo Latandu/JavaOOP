@@ -8,11 +8,18 @@ public class Guarana extends Plant{
     }
 
     @Override
+    protected int Collision(Point point) {
+        return 0;
+    }
+
+    @Override
     protected boolean SpecialAttack(Organism organism) {
         organism.setStrength(organism.getStrength() + 3);
-        world.DeleteOrganism(this,point.getX(), point.getY());
+        int x = point.getX();
+        int y = point.getY();
+        world.DeleteOrganism(this, x, y);
         world.DeleteOrganism(organism, organism.getPoint().getX(), organism.getPoint().getY());
-        world.AddOrganism(organism, point.getX(), point.getY());
+        world.AddOrganism(organism, x, y);
         return true;
     }
 }

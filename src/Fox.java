@@ -12,7 +12,7 @@ public class Fox extends Animal{
     @Override
     protected void Action(){
         boolean[] isNotFilled = {false, false, false, false};
-        if(super.CheckForFilling(isNotFilled, 1, '"', point) != 0){
+        if(super.organismHandler.CheckForFilling(isNotFilled, 1, '"', point, world) != 0){
             return;
         }
         while(true){

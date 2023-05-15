@@ -1,14 +1,45 @@
 import javax.swing.*;
-import java.awt.GridLayout;
+import java.awt.*;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Random;
+import java.util.Scanner;
 
 public class World {
-    Random rand = new Random();
-    private final int rows, columns;
+    protected GUILayout guiLayout;
+   protected Random rand = new Random();
+    private int rows;
+    private int columns;
     private int numberOfRounds;
+
+    public int getNumberOfRounds() {
+        return numberOfRounds;
+    }
+
+    public void setNumberOfRounds(int numberOfRounds) {
+        this.numberOfRounds = numberOfRounds;
+    }
+
+    public boolean isPowerUP() {
+        return powerUP;
+    }
+
+    public void setPowerUP(boolean powerUP) {
+        this.powerUP = powerUP;
+    }
+
+    private boolean powerUP = false;
     private boolean AliveHuman = true;
+    private int setDirection = 0;
+
+    public int getSetDirection() {
+        return setDirection;
+    }
+
+    public void setSetDirection(int setDirection) {
+        this.setDirection = setDirection;
+    }
 
     public boolean isAliveHuman() {
         return AliveHuman;
@@ -20,23 +51,20 @@ public class World {
 
     private ArrayList<ArrayList<Organism>> grid;
     private ArrayList<Organism> organismVector;
+
+    public ArrayList<ArrayList<Organism>> getGrid() {
+        return grid;
+    }
+
+    public void setGrid(ArrayList<ArrayList<Organism>> grid) {
+        this.grid = grid;
+    }
+
     public World(int rows, int columns) {
         this.rows = rows;
         this.columns = columns;
         this.organismVector = new ArrayList<>();
         initializeGrid(rows,columns);
-        JFrame frame = new JFrame("Dynamic Grid Layout Example");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        GridLayout gridLayout = new GridLayout(rows, columns);
-        frame.setLayout(gridLayout);
-        JButton[] buttons = new JButton[rows * columns];
-        for (int i = 0; i < rows * columns; i++) {
-            JButton button = new JButton("Button " + (i + 1));
-            buttons[i] = button;
-            frame.add(button);
-        }
-        frame.pack();
-        frame.setVisible(true);
     }
     public void initializeGrid(int rows, int columns) {
         grid = new ArrayList<>(rows);
@@ -47,18 +75,6 @@ public class World {
                 row.add(null);
             }
             grid.add(row);
-        }
-    }
-    private void drawWorld(){
-        System.out.println("It is now turn: " + numberOfRounds);
-        for(int i = 0; i < rows; i++){
-            for(int j = 0; j < columns; j++){
-                if(grid.get(i).get(j) == null){
-                    System.out.print('.');
-                }
-                else System.out.print(grid.get(i).get(j).getSymbol());
-            }
-            System.out.println();
         }
     }
     public char ReturnSymbol(int row, int column){
@@ -91,20 +107,20 @@ public class World {
             return 0;
         return grid.get(row).get(column).getStrength();
     }
-    private void FillBoardWithOrganisms(){
-        /*Organism human = new Human();
-        AddRandomlyCharacter(human);*/
-        Organism fox = new Fox();
-        Organism belladonna = new Belladonna();
-        Organism Antelope = new Antelope();
-        Organism grass = new Grass();
-        Organism guarana = new Guarana();
-        Organism sheep = new Sheep();
-        Organism sosnowsky = new Sosnowsky();
-        Organism sowthistle = new SowThistle();
-        Organism turtle = new Turtle();
-        Organism wolf = new Wolf();
-        for(int i = 0; i < rows * columns / 25; i++){
+    protected void FillBoardWithOrganisms(){
+        Organism human = new Human();
+        AddRandomlyCharacter(human);
+        for(int i = 0; i < rows * columns * 0.15 / 10 + 1; i++){
+            Organism fox = new Fox();
+            Organism belladonna = new Belladonna();
+            Organism Antelope = new Antelope();
+            Organism grass = new Grass();
+            Organism guarana = new Guarana();
+            Organism sheep = new Sheep();
+            Organism sosnowsky = new Sosnowsky();
+            Organism sowthistle = new SowThistle();
+            Organism turtle = new Turtle();
+            Organism wolf = new Wolf();
             AddRandomlyCharacter(fox);
             AddRandomlyCharacter(belladonna);
             AddRandomlyCharacter(Antelope);
@@ -128,7 +144,7 @@ public class World {
         if(grid.get(rowRandom).get(columnRandom) == null){
             organism.setPoint(rowRandom, columnRandom);
             organism.setWorld(this);
-            grid.get(rowRandom).set(columnRandom, organism);
+            grid.get(organism.getPoint().getX()).set(organism.getPoint().getY(), organism);
             organismVector.add(organism);
         }
     }
@@ -150,8 +166,81 @@ public class World {
     public int getColumns() {
         return columns;
     }
+    public void saveToFile() {
+        try (PrintWriter writer = new PrintWriter(new FileWriter("data.txt"))) {
+            writer.println(columns + " " + rows);
+            writer.println(numberOfRounds + " " + AliveHuman);
+            writer.println(powerUP);
+            for (Organism organism : organismVector) {
+                writer.println(organism.getAge() + " " + organism.getStrength() + " " + organism.getSymbol() + " " +
+                        organism.getCoolDown() + " " + organism.getPoint().getX() + " " + organism.getPoint().getY() + " " +
+                        organism.getAnimalName() + " " + organism.getInitiative() + " " + organism.isRoundDone());
+            }
+        } catch (IOException e) {
+            System.out.println("Failed to write to file! Exiting...");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
 
-    private void makeTurn() {
+    public void readFromFile() {
+
+        try (Scanner scanner = new Scanner(new File("data.txt"))) {
+            rows = scanner.nextInt();
+            columns = scanner.nextInt();
+            numberOfRounds = scanner.nextInt();
+            AliveHuman = scanner.nextBoolean();
+            powerUP = scanner.nextBoolean();
+            initializeGrid(rows, columns);
+            while (scanner.hasNextInt()) {
+                int age = scanner.nextInt();
+                int strength = scanner.nextInt();
+                char symbol = scanner.next().charAt(0);
+                int coolDown = scanner.nextInt();
+                int pointX = scanner.nextInt();
+                int pointY = scanner.nextInt();
+                String animalName = scanner.next();
+                int initiative = scanner.nextInt();
+                boolean roundDone = scanner.nextBoolean();
+                initializeOrganism(age, strength, coolDown, initiative, pointX, pointY, symbol, roundDone, animalName);
+            }
+        } catch (FileNotFoundException e) {
+            System.out.println("Failed to retrieve from file! Exiting...");
+            e.printStackTrace();
+            System.exit(1);
+        }
+    }
+
+    public void initializeOrganism(int age, int strength, int coolDown, int initiative, int pointX, int pointY, char symbol,
+                                   boolean roundDone, String animalName) {
+        Organism organism = switch (symbol) {
+            case 'W' -> new Wolf();
+            case 'A' -> new Antelope();
+            case 'E' -> new Sheep();
+            case 'T' -> new Turtle();
+            case 'F' -> new Fox();
+            case 'B' -> new Belladonna();
+            case 'S' -> new Sosnowsky();
+            case 'G' -> new Guarana();
+            case 'R' -> new Grass();
+            case 'O' -> new SowThistle();
+            case '@' -> new Human();
+            default -> null;
+        };
+        if (organism == null) return;
+        organism.setAge(age);
+        organism.setStrength(strength);
+        organism.setInitiative(initiative);
+        organism.setSymbol(symbol);
+        organism.setCoolDown(coolDown);
+        organism.setPoint(pointX, pointY);
+        organism.setRoundDone(roundDone);
+        organism.setAnimalName(animalName);
+        organism.setWorld(this);
+        grid.get(pointX).set(pointY, organism);;
+        organismVector.add(organism);
+    }
+    protected void makeTurn() {
         int organismVectorSize = organismVector.size();
         while (organismVectorSize >= 0) {
             int highestInitiative = 0;
@@ -198,21 +287,14 @@ public class World {
         }
         numberOfRounds++;
     }
-    public void WholeGame(){
-        FillBoardWithOrganisms();
-        drawWorld();
-        makeTurn();
-        makeTurn();
-        System.out.println();
-        drawWorld();
-        makeTurn();
-        System.out.println();
-        drawWorld();
-        /*while(AliveHuman){
+    public void WholeGame(GUILayout guiLayoutMain){
+        this.guiLayout = guiLayoutMain;
+        guiLayout.drawWorld();
+        while(isAliveHuman()){
+            makeTurn();
+            guiLayout.drawWorld();
+            guiLayout.waitForButtonPress();
+        }
 
-            if(!AliveHuman){
-                return;
-            }
-        }*/
-    }
+        }
 }

@@ -1,5 +1,6 @@
 import java.util.Random;
 public class Animal extends Organism {
+    OrganismHandler organismHandler = new OrganismHandler();
     private static final int error = 4;
     private static final int killedAnimal = 0;
     private static final int killedAnimalAttacker = 1;
@@ -9,7 +10,7 @@ public class Animal extends Organism {
     @Override
     protected void Action() {
         boolean[] isNotFilled = {false, false, false, false};
-        if (CheckForFilling(isNotFilled, 1, '"', point) != 0) {
+        if (organismHandler.CheckForFilling(isNotFilled, 1, '"', point, world) != 0) {
             return;
         }
         int positionReturnCode = 0;
@@ -67,16 +68,16 @@ public class Animal extends Organism {
     }
     protected int PositionAndCollision(int row, int column){
         Point pointDefender = new Point();
-        int varX = point.getX() + row;
-        int varY = point.getY() + column;
+        int varX = super.point.getX() + row;
+        int varY = super.point.getY() + column;
         if(varX < 0 || varY < 0 || varX > world.getRows() || varY > world.getColumns())
             return 1;
         pointDefender.setX(varX);
         pointDefender.setY(varY);
         int collisionReturn = Collision(pointDefender);
         if(collisionReturn == noCollision || collisionReturn== killedAnimal){
-            point.setX(varX);
-            point.setY(varY);
+            super.point.setX(varX);
+            super.point.setY(varY);
             return 1;
         }
         else if(collisionReturn == killedAnimalAttacker || collisionReturn == reproduciton|| collisionReturn == error){
@@ -90,13 +91,14 @@ public class Animal extends Organism {
         int getAgeDefender = world.ReturnAge(pointDefender.getX(), pointDefender.getY());
         if(worldSymbol == getSymbol() && getAgeDefender >= 3 && getSymbol() != '@'){
             boolean[] isNotFilled = {false,false,false,false};
-            if(CheckForFilling(isNotFilled, 1, '*', point) != 0){
+            if(organismHandler.CheckForFilling(isNotFilled, 1, '*', point, world) != 0){
                 boolean[] isNotFilled2 = {false, false, false, false};
-                if(CheckForFilling(isNotFilled2, 1, '*', pointDefender) != 0) return error;
+                if(organismHandler.CheckForFilling(isNotFilled2, 1, '*', pointDefender, world) != 0) return error;
                 while(true){
                     int randIndex2 = rand.nextInt(0, 4);
                     if(isNotFilled2[randIndex2]){
-                        AddNewOrganism(randIndex2, pointDefender, CreateNewAnimal(getSymbol()));
+
+                        organismHandler.AddNewOrganism(randIndex2, pointDefender, CreateNewAnimal(getSymbol()), world);
                         return reproduciton;
                     }
                 }
@@ -104,7 +106,7 @@ public class Animal extends Organism {
             while(true){
                 int randIndex2 = rand.nextInt(0,4);
                 if(isNotFilled[randIndex2]){
-                    AddNewOrganism(randIndex2, point, CreateNewAnimal(getSymbol()));
+                    organismHandler.AddNewOrganism(randIndex2, point, CreateNewAnimal(getSymbol()),world);
                     return reproduciton;
                 }
             }
@@ -133,49 +135,5 @@ public class Animal extends Organism {
             return noCollision;
         }
         return error;
-    }
-    public int CheckForFilling(boolean[] isNotFilled, int change, char check, Point pointF){
-        int x = pointF.getX();
-        int y = pointF.getY();
-        if (check == '"') {
-            if(world.ReturnSymbol(x - change, y) != check) isNotFilled[0] = true;
-            if(world.ReturnSymbol(x + change, y) != check) isNotFilled[1] = true;
-            if(world.ReturnSymbol(x, y - change) != check) isNotFilled[2] = true;
-            if(world.ReturnSymbol(x, y + change) != check) isNotFilled[3] = true;
-        }
-        else if(check == '*'){
-            if(world.ReturnSymbol(x - change, y) == check) isNotFilled[0] = true;
-            if(world.ReturnSymbol(x + change, y) == check) isNotFilled[1] = true;
-            if(world.ReturnSymbol(x, y - change) == check) isNotFilled[2] = true;
-            if(world.ReturnSymbol(x, y + change) == check) isNotFilled[3] = true;
-        }
-        for(int i = 0; i < 4; i++){
-            if(isNotFilled[i]) return 0;
-        }
-        return 1;
-    }
-    protected void AddNewOrganism(int randIndex, Point pointF, Organism organism){
-        switch(randIndex){
-            case 0->{
-                pointF.setX(point.getX() - 1);
-                pointF.setY(point.getY());
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
-            }
-            case 1->{
-                pointF.setX(point.getX() + 1);
-                pointF.setY(point.getY());
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
-            }
-            case 2->{
-                pointF.setX(point.getX());
-                pointF.setY(point.getY() - 1);
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
-            }
-            case 3->{
-                pointF.setX(point.getX());
-                pointF.setY(point.getY() + 1);
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
-            }
-        }
     }
 }

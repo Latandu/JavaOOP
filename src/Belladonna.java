@@ -8,6 +8,11 @@ public class Belladonna extends Plant{
     }
 
     @Override
+    protected int Collision(Point point) {
+        return 0;
+    }
+
+    @Override
     protected boolean SpecialAttack(Organism organism) {
         if(organism == this){
             return false;
