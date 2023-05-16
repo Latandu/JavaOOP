@@ -7,6 +7,24 @@ import java.util.Random;
 import java.util.Scanner;
 
 public class World {
+    public void setTextArea(String textArea) {
+        this.textArea = textArea;
+    }
+
+    public String getTextArea() {
+        return textArea;
+    }
+
+    public String getCoolDownText() {
+        return coolDownText;
+    }
+
+    public void setCoolDownText(String coolDownText) {
+        this.coolDownText = coolDownText;
+    }
+
+    private String coolDownText;
+    private String textArea;
     protected GUILayout guiLayout;
    protected Random rand = new Random();
     private int rows;
@@ -66,7 +84,7 @@ public class World {
         this.organismVector = new ArrayList<>();
         initializeGrid(rows,columns);
     }
-    public void initializeGrid(int rows, int columns) {
+    protected void initializeGrid(int rows, int columns) {
         grid = new ArrayList<>(rows);
 
         for (int i = 0; i < rows; i++) {
@@ -77,7 +95,7 @@ public class World {
             grid.add(row);
         }
     }
-    public char ReturnSymbol(int row, int column){
+    protected char ReturnSymbol(int row, int column){
         if(row < 0 || column < 0 || row >= rows || column >= columns){
             return '"';
         }
@@ -86,7 +104,7 @@ public class World {
         }
         return grid.get(row).get(column).getSymbol();
     }
-    public int ReturnAge(int row, int column){
+    protected int ReturnAge(int row, int column){
         if(row < 0 || column < 0 || row >= rows || column >= columns){
             return 0;
         }
@@ -95,12 +113,12 @@ public class World {
         }
         return grid.get(row).get(column).getAge();
     }
-    public Organism GetOrganism(int row, int column){
+    protected Organism GetOrganism(int row, int column){
         if(row < 0 || column < 0 || row >= rows || column >= columns)
             return null;
         return grid.get(row).get(column);
     }
-    public int GetStrength(int row, int column){
+    protected int GetStrength(int row, int column){
         if(row < 0 || column < 0 || row >= rows || column >= columns)
             return 0;
         if(grid.get(row).get(column) == null)
@@ -110,7 +128,8 @@ public class World {
     protected void FillBoardWithOrganisms(){
         Organism human = new Human();
         AddRandomlyCharacter(human);
-        for(int i = 0; i < rows * columns * 0.15 / 10 + 1; i++){
+        for(int i = 0; i < (rows * columns * 0.3
+                /10) ; i++){
             Organism fox = new Fox();
             Organism belladonna = new Belladonna();
             Organism Antelope = new Antelope();
@@ -148,15 +167,17 @@ public class World {
             organismVector.add(organism);
         }
     }
-    public void DeleteOrganism(Organism organism, int row, int column){
+    protected void DeleteOrganism(Organism organism, int row, int column){
         grid.get(row).set(column, null);
         organismVector.remove(organism);
     }
-    public void AddOrganism(Organism organism, int row, int column){
+    protected void AddOrganism(Organism organism, int row, int column){
         organism.setWorld(this);
         organism.setPoint(row, column);
         grid.get(row).set(column, organism);
         organismVector.add(organism);
+        if(row != grid.get(row).get(column).getPoint().getX() || column != grid.get(row).get(column).getPoint().getY())
+            return;
     }
 
     public int getRows() {
@@ -166,7 +187,7 @@ public class World {
     public int getColumns() {
         return columns;
     }
-    public void saveToFile() {
+    protected void saveToFile() {
         try (PrintWriter writer = new PrintWriter(new FileWriter("data.txt"))) {
             writer.println(columns + " " + rows);
             writer.println(numberOfRounds + " " + AliveHuman);
@@ -176,6 +197,8 @@ public class World {
                         organism.getCoolDown() + " " + organism.getPoint().getX() + " " + organism.getPoint().getY() + " " +
                         organism.getAnimalName() + " " + organism.getInitiative() + " " + organism.isRoundDone());
             }
+            writer.println(guiLayout.getCoolDown() + "\r");
+            writer.print(guiLayout.getTextArea() + "~");
         } catch (IOException e) {
             System.out.println("Failed to write to file! Exiting...");
             e.printStackTrace();
@@ -183,7 +206,7 @@ public class World {
         }
     }
 
-    public void readFromFile() {
+    protected void readFromFile() {
 
         try (Scanner scanner = new Scanner(new File("data.txt"))) {
             rows = scanner.nextInt();
@@ -202,8 +225,11 @@ public class World {
                 String animalName = scanner.next();
                 int initiative = scanner.nextInt();
                 boolean roundDone = scanner.nextBoolean();
-                initializeOrganism(age, strength, coolDown, initiative, pointX, pointY, symbol, roundDone, animalName);
+                scanner.nextLine(); // Move to the next line after reading the boolean value
+                initializeOrganism(age, strength, coolDown, initiative, pointX, pointY, symbol, roundDone, animalName, textArea);
             }
+            coolDownText = scanner.useDelimiter("\r").next();
+            textArea = scanner.useDelimiter("~").next();
         } catch (FileNotFoundException e) {
             System.out.println("Failed to retrieve from file! Exiting...");
             e.printStackTrace();
@@ -211,8 +237,8 @@ public class World {
         }
     }
 
-    public void initializeOrganism(int age, int strength, int coolDown, int initiative, int pointX, int pointY, char symbol,
-                                   boolean roundDone, String animalName) {
+    protected void initializeOrganism(int age, int strength, int coolDown, int initiative, int pointX, int pointY, char symbol,
+                                   boolean roundDone, String animalName, String textArea) {
         Organism organism = switch (symbol) {
             case 'W' -> new Wolf();
             case 'A' -> new Antelope();
@@ -237,7 +263,8 @@ public class World {
         organism.setRoundDone(roundDone);
         organism.setAnimalName(animalName);
         organism.setWorld(this);
-        grid.get(pointX).set(pointY, organism);;
+        grid.get(pointX).set(pointY, organism);
+        setTextArea(textArea);
         organismVector.add(organism);
     }
     protected void makeTurn() {
@@ -275,14 +302,17 @@ public class World {
             i.setRoundDone(false);
             i.setAge(i.getAge() + 1);
             if(i.getSymbol() == '@'){
-                if(i.getCoolDown() > 0){
-                    i.setCoolDown(i.getCoolDown() - 1);
-                }
-                else if(i.getStrength() > 5){
+                if(i.getStrength() > 5){
+                    guiLayout.setCoolDownText("Human strength: " + i.getStrength());
                     i.setStrength(i.getStrength() - 1);
                     i.setCoolDown(5);
 
                 }
+                else if(i.getCoolDown() > 0){
+                    guiLayout.setCoolDownText("Left cool down: " + i.getCoolDown());
+                    i.setCoolDown(i.getCoolDown() - 1);
+                }
+                else guiLayout.setCoolDownText("Human strength: " + i.getStrength());
             }
         }
         numberOfRounds++;

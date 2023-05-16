@@ -53,6 +53,7 @@ public class Antelope extends Animal {
 
         int randomFightReturn = rand.nextInt(0,2);
         if(randomFightReturn == 1){
+            Main.setLogs(getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() + " avoided attack" + "\n");
             boolean[] isNotFilled = {false, false,false ,false};
             if(super.organismHandler.CheckForFilling(isNotFilled, 2, '"', point, world) != 0) {
                 return true;

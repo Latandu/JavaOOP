@@ -20,26 +20,27 @@ public class OrganismHandler {
         return 1;
     }
     protected void AddNewOrganism(int randIndex, Point pointF, Organism organism, World world){
+        Point myPoint = new Point();
         switch(randIndex){
             case 0->{
-                pointF.setX(pointF.getX() - 1);
-                pointF.setY(pointF.getY());
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
+                myPoint.setX(pointF.getX() - 1);
+                myPoint.setY(pointF.getY());
+                world.AddOrganism(organism, myPoint.getX(), myPoint.getY());
             }
             case 1->{
-                pointF.setX(pointF.getX() + 1);
-                pointF.setY(pointF.getY());
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
+                myPoint.setX(pointF.getX() + 1);
+                myPoint.setY(pointF.getY());
+                world.AddOrganism(organism, myPoint.getX(), myPoint.getY());
             }
             case 2->{
-                pointF.setX(pointF.getX());
-                pointF.setY(pointF.getY() - 1);
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
+                myPoint.setX(pointF.getX());
+                myPoint.setY(pointF.getY() - 1);
+                world.AddOrganism(organism, myPoint.getX(), myPoint.getY());
             }
             case 3->{
-                pointF.setX(pointF.getX());
-                pointF.setY(pointF.getY() + 1);
-                world.AddOrganism(organism, pointF.getX(), pointF.getY());
+                myPoint.setX(pointF.getX());
+                myPoint.setY(pointF.getY() + 1);
+                world.AddOrganism(organism, myPoint.getX(), myPoint.getY());
             }
         }
     }

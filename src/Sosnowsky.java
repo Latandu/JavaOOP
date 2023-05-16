@@ -13,8 +13,11 @@ public class Sosnowsky extends Plant {
         }
         else{
             if(organism.getSymbol() == '@'){
+                Main.setLogs("Human killed! Game Lost! \n");
                 world.setAliveHuman(false);
             }
+            Main.setLogs(getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() + " killed by being eaten " + organism.getAnimalName() + "\n");
+            world.DeleteOrganism(this, getPoint().getX(), getPoint().getY());
             world.DeleteOrganism(organism, organism.getPoint().getX(), organism.getPoint().getY());
             return true;
         }
@@ -34,8 +37,10 @@ public class Sosnowsky extends Plant {
 
             if (organism != null && organism.getInitiative() != 0) {
                 if (organism.getSymbol() == '@') {
+                    Main.setLogs("Human killed! Game Lost! \n");
                     world.setAliveHuman(false);
                 }
+                Main.setLogs(getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() + " killed " + organism.getAnimalName() + "\n");
                 world.DeleteOrganism(organism, neighborX, neighborY);
             }
         }

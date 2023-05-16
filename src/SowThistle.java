@@ -15,6 +15,7 @@ public class SowThistle extends Plant{
         int randNum = rand.nextInt(10);
         if(randNum == 0){
             for(int i = 0; i < 3; i++){
+                Main.setLogs(getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() + " reproduced 3 times" + "\n");
               super.Action();
             }
         } else {

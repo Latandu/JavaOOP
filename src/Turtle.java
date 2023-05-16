@@ -23,6 +23,7 @@ public class Turtle extends Animal{
         if(this == organism) {
             return false;
         }
+        Main.setLogs(getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() + " avoided attack" + "\n");
         return organism.getStrength() > 5;
     }
 }

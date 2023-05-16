@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.awt.event.*;
 import java.util.ArrayList;
@@ -8,7 +9,7 @@ public class GUILayout {
     private JPanel mainPanel;
     private int rows, columns;
     private JFrame frame;
-    JLabel turnNumber;
+    JLabel turnNumber, coolDown;
     private CountDownLatch buttonLatch;
     private JButton[][] buttonsArray;
     private JButton nextTurn, saveFile;
@@ -25,14 +26,20 @@ public class GUILayout {
     private JScrollPane scrollPanel;
     private World world;
 
-    public GUILayout(int rowsGUI, int columnsGUI, World worldGUI){
+    public String getCoolDown() {
+        return coolDown.getText();
+    }
+
+    public void setCoolDownText(String string){
+        coolDown.setText(string);
+
+    }    public GUILayout(int rowsGUI, int columnsGUI, World worldGUI){
         this.rows = rowsGUI;
         this.columns = columnsGUI;
         this.world = worldGUI;
         frame = new JFrame("Game");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         JLabel savedFileLabel = new JLabel();
-
         JPanel gridPanel = new JPanel();
         GridLayout gridLayout = new GridLayout(rows, columns);
         gridPanel.setLayout(gridLayout);
@@ -40,7 +47,7 @@ public class GUILayout {
         for (int i = 0; i <rows; i++) {
             for(int j = 0; j < columns; j++){
                 JButton button = new JButton("xx");
-                button.setPreferredSize(new Dimension(50,50));
+                button.setPreferredSize(new Dimension(50, 50));
                 buttonsArray[i][j] = button;
                 gridPanel.add(button);
                 int finalI = i;
@@ -60,12 +67,14 @@ public class GUILayout {
         }
         buttonLatch = new CountDownLatch(1);
         // Create a JTextArea and put it inside a JScrollPane
-        textArea = new JTextArea(rows + 20, columns + 20);
+        textArea = new JTextArea(rows + 20, 40);
         textArea.setEditable(false);
         scrollPanel = new JScrollPane(textArea);
+        scrollPanel.getVerticalScrollBar().setPreferredSize(new Dimension(0,0));
          nextTurn = new JButton("Next Turn");
          saveFile = new JButton("Save File");
          turnNumber = new JLabel("Round number: " + world.getNumberOfRounds());
+         coolDown = new JLabel(" ");
         // Create a JPanel to hold the text container
         JPanel groupPanel = new JPanel();
         GroupLayout groupLayout = new GroupLayout(groupPanel);
@@ -73,6 +82,7 @@ public class GUILayout {
         groupLayout.setHorizontalGroup(
                 groupLayout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addComponent(turnNumber)
+                        .addComponent(coolDown)
                         .addComponent(nextTurn)
                         .addGroup(groupLayout.createSequentialGroup()
                                 .addComponent(saveFile)
@@ -82,6 +92,7 @@ public class GUILayout {
         groupLayout.setVerticalGroup(
                 groupLayout.createSequentialGroup()
                         .addComponent(turnNumber)
+                        .addComponent(coolDown)
                         .addComponent(nextTurn)
                         .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(groupLayout.createParallelGroup(GroupLayout.Alignment.BASELINE)
@@ -95,8 +106,11 @@ public class GUILayout {
                 return true;
             }
         };;
-        mainPanel.add(gridPanel, BorderLayout.WEST);
-        mainPanel.add(groupPanel, BorderLayout.EAST);
+        JPanel innerPanel = new JPanel(new BorderLayout());
+        innerPanel.add(gridPanel, BorderLayout.WEST);
+        innerPanel.setBorder(new EmptyBorder(0, 10, 0, 10));
+        innerPanel.add(groupPanel, BorderLayout.EAST);
+        mainPanel.add(innerPanel, BorderLayout.CENTER);
         nextTurn.addActionListener(e -> {buttonLatch.countDown(); savedFileLabel.setText(" ");});
         saveFile.addActionListener(actionEvent -> {
             textArea.append("Filed saved at round: " + world.getNumberOfRounds() + "\n");

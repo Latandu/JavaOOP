@@ -1,12 +1,12 @@
 import java.util.Random;
 public class Animal extends Organism {
-    OrganismHandler organismHandler = new OrganismHandler();
+    protected OrganismHandler organismHandler = new OrganismHandler();
     private static final int error = 4;
     private static final int killedAnimal = 0;
     private static final int killedAnimalAttacker = 1;
     private static final int reproduciton = 2;
     private static final int noCollision = 3;
-    Random rand = new Random();
+   protected Random rand = new Random();
     @Override
     protected void Action() {
         boolean[] isNotFilled = {false, false, false, false};
@@ -21,6 +21,7 @@ public class Animal extends Organism {
                     case 0 -> {
                         positionReturnCode = PositionAndCollision(-1, 0);
                         if (positionReturnCode == 0) break;
+
                         world.AddOrganism(this, point.getX(), point.getY());
                     }
                     case 1 -> {
@@ -89,7 +90,7 @@ public class Animal extends Organism {
     protected int Collision(Point pointDefender){
         char worldSymbol = world.ReturnSymbol(pointDefender.getX(), pointDefender.getY());
         int getAgeDefender = world.ReturnAge(pointDefender.getX(), pointDefender.getY());
-        if(worldSymbol == getSymbol() && getAgeDefender >= 3 && getSymbol() != '@'){
+        if(worldSymbol == getSymbol() && getAgeDefender >= 2 && getSymbol() != '@'){
             boolean[] isNotFilled = {false,false,false,false};
             if(organismHandler.CheckForFilling(isNotFilled, 1, '*', point, world) != 0){
                 boolean[] isNotFilled2 = {false, false, false, false};
@@ -97,8 +98,8 @@ public class Animal extends Organism {
                 while(true){
                     int randIndex2 = rand.nextInt(0, 4);
                     if(isNotFilled2[randIndex2]){
-
                         organismHandler.AddNewOrganism(randIndex2, pointDefender, CreateNewAnimal(getSymbol()), world);
+                        Main.setLogs("Reproduction of organisms: " + getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() +"\n");
                         return reproduciton;
                     }
                 }
@@ -107,6 +108,7 @@ public class Animal extends Organism {
                 int randIndex2 = rand.nextInt(0,4);
                 if(isNotFilled[randIndex2]){
                     organismHandler.AddNewOrganism(randIndex2, point, CreateNewAnimal(getSymbol()),world);
+                    Main.setLogs("Reproduction of organisms: " + getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() +"\n");
                     return reproduciton;
                 }
             }
@@ -117,21 +119,26 @@ public class Animal extends Organism {
                 return error;
             }
             if(newFightingOrganism.getStrength() > getStrength()){
-               if(this.getSymbol() == '@')
-                   world.setAliveHuman(false);
+               if(this.getSymbol() == '@'){
+                   Main.setLogs("Human killed! Game Lost! \n");
+                   world.setAliveHuman(false);}
                 world.DeleteOrganism(this, point.getX(), point.getY());
+                Main.setLogs("Killed organism: " + getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() +"\n");
                 return killedAnimalAttacker;
             }
             if(newFightingOrganism.getStrength() <= getStrength()){
-                if(newFightingOrganism.getSymbol() == '@')
-                    world.setAliveHuman(false);
+                if(newFightingOrganism.getSymbol() == '@'){
+                    Main.setLogs("Human killed! Game Lost! \n");
+                    world.setAliveHuman(false);}
                 world.DeleteOrganism(this, point.getX(), point.getY());
                 world.DeleteOrganism(newFightingOrganism, pointDefender.getX(), pointDefender.getY());
+                Main.setLogs("Killed organism: " + newFightingOrganism.getAnimalName() + " at point " + newFightingOrganism.getPoint().getX() + ", "+ newFightingOrganism.getPoint().getY() +"\n");
                 return killedAnimal;
             }
         }
         else{
             world.DeleteOrganism(this, point.getX(), point.getY());
+            Main.setLogs("Moved organism: " + getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() +"\n");
             return noCollision;
         }
         return error;

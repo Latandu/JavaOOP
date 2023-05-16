@@ -18,8 +18,10 @@ public class Belladonna extends Plant{
             return false;
         }
         else{
-            if(organism.getSymbol() == '@')
-                world.setAliveHuman(false);
+            if(organism.getSymbol() == '@'){
+                Main.setLogs("Human killed! Game Lost! \n");
+                world.setAliveHuman(false);}
+
             world.DeleteOrganism(organism, organism.getPoint().getX(), organism.getPoint().getY());
             return true;
         }

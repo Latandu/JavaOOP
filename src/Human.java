@@ -23,9 +23,9 @@ public class Human extends Animal {
         if(world.isPowerUP()){
             if(getCoolDown() == 0){
                 this.setStrength(10);
-                world.guiLayout.setTextArea("Activated SuperPower. Added 10 strength \n");
+                world.guiLayout.setTextArea("Activated SuperPower. Added 5 strength \n");
                 world.setPowerUP(false);
-            }
+            } else world.setPowerUP(false);
         }
         switch(direction){
             case 1 -> {

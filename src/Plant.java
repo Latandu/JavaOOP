@@ -1,9 +1,8 @@
 import java.util.Random;
 
 public abstract class Plant extends Organism{
-    Animal animalClass = new Animal();
-    OrganismHandler organismHandler = new OrganismHandler();
-    Random rand = new Random();
+    protected OrganismHandler organismHandler = new OrganismHandler();
+    protected Random rand = new Random();
     @Override
     protected void Action(){
         boolean[] isNotFilled = {false,false,false,false};
@@ -15,6 +14,7 @@ public abstract class Plant extends Organism{
                 int randIndex = rand.nextInt(0,4);
                 if(isNotFilled[randIndex]){
                     organismHandler.AddNewOrganism(randIndex, point, CreateNewPlant(getSymbol()), world);
+                    Main.setLogs("Reproduction of organisms: " + getAnimalName() + " at point " + getPoint().getX() + ", "+ getPoint().getY() +"\n");
                     break;
                 }
             }
